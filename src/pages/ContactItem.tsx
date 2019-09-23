@@ -55,9 +55,6 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
     
     
     async componentDidMount () {
-        console.log('componentDidMount')
-        console.log('props', this.props)
-        console.log('state', this.state)
         const {id} = this.props
         this._isMounted = true
         this._isCreate = !(id !== undefined && id !== '')
@@ -68,11 +65,11 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
                 const contact = Object.assign({}, data.contact)
                 
                 if (this._isMounted) {
-                    this.setState(data, () => {console.log('STATE SET!!')})
+                    this.setState(data, () => {console.log('ContactItem component mounted!!')})
                 }
                 
             } catch(e) {
-                console.log(e)
+                console.warn(e)
             }
         } else {
             console.log('no id')
@@ -98,8 +95,6 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
     }
 
     render () {
-        console.log('props', this.props)
-        console.log('state', this.state)
         const {id} = this.props
         const {contact} = this.state
         const {name, email} = contact
@@ -158,8 +153,6 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
                         <Button
                             variant="contained" color="secondary"
                             onClick={() => {
-                                console.log('this.deleteContact(id)')
-                                console.log(id)
                                 this.deleteContact(id)
                                 this.props.history.push('/')
                             }}

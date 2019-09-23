@@ -9,7 +9,6 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import {ListItemLink} from '../components'
 
 export const Home = function (props: any): any {
-    console.warn('props', props)
     const {contacts} = props
     return (
         <List
