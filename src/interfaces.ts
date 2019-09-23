@@ -1,3 +1,5 @@
+import { RouteComponentProps } from 'react-router-dom'
+
 export interface Contact {
     id: string | undefined,
     email: string | undefined,
@@ -5,10 +7,12 @@ export interface Contact {
 }
 
 
-export interface ContactItemProps {
+export interface ContactItemProps extends RouteComponentProps {
     id: string,
     getContact: (id: string) => {},
     addContact: (contact: Contact) => {},
+    updateContact: (contact: Contact) => {},    
+    deleteContact: (id: string) => {},
     readonly: boolean
 }
 

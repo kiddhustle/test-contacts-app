@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 // import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import TextField from '@material-ui/core/TextField';
@@ -14,6 +14,8 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
         this.onKeyChange = this.onKeyChange.bind(this)
         this.getContact = props.getContact
         this.addContact = props.addContact
+        this.updateContact = props.updateContact
+        this.deleteContact = props.deleteContact
     }
 
     _isMounted = false;
@@ -30,7 +32,8 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
 
     static defaultProps = {
         id: undefined,
-        readonly: true
+        isEdit: false,
+        history: {}
     }
 
     getContact (id: string) {
@@ -40,6 +43,16 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
     addContact (contact: Contact) {
         throw Error('No getContact property passed')
     }
+
+    updateContact (contact: Contact) {
+        throw Error('No getContact property passed')
+    }
+
+    deleteContact (id: string) {
+        throw Error('No getContact property passed')
+    }
+
+    
     
     async componentDidMount () {
         console.log('componentDidMount')
@@ -87,13 +100,13 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
     render () {
         console.log('props', this.props)
         console.log('state', this.state)
-        const {id, readonly} = this.props
+        const {id} = this.props
         const {contact} = this.state
         const {name, email} = contact
 
         return (
             <form noValidate autoComplete="off">
-                {this._isCreate ? (
+                {!this._isCreate ? (
                     <React.Fragment>
                         <TextField
                             id="contact-id"
@@ -103,7 +116,6 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
                             />
                             <br />
                     </React.Fragment>
-                    
                 ) : (
                     null
                 )}
@@ -112,7 +124,6 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
                     id="contact-name"
                     label="Name"
                     value={name}
-                    InputProps={{readOnly: readonly}}
                     onChange={this.onKeyChange}
                     />
                     <br />
@@ -120,17 +131,42 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
                     id="contact-email"
                     label="Email"
                     value={email}
-                    InputProps={{readOnly: readonly}}
                     onChange={this.onKeyChange}
                     /><br /><br />
                 {this._isCreate ? (
-                    <Button variant="contained" color="primary" onClick={() => {this.addContact(contact)}}>
+                    <Button
+                        variant="contained" color="primary"
+                        onClick={() => {
+                            this.addContact(contact)
+                            this.props.history.push('/')
+                            }}>
                         Create
                     </Button>
                 ) : (
-                    <Button variant="contained" color="primary">
-                        Save
-                    </Button>
+                    <Fragment>
+                        <Button
+                            variant="contained" color="primary"
+                            onClick={() => {
+                                this.updateContact(contact)
+                                this.props.history.push('/')
+                            }
+                            }
+                            >
+                            Save
+                        </Button>
+                        &nbsp;
+                        <Button
+                            variant="contained" color="secondary"
+                            onClick={() => {
+                                console.log('this.deleteContact(id)')
+                                console.log(id)
+                                this.deleteContact(id)
+                                this.props.history.push('/')
+                            }}
+                            >
+                            Delete
+                        </Button>
+                    </Fragment>
                 )}
                 
             </form>

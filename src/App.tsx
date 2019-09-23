@@ -5,6 +5,7 @@ import "./App.css";
 import Avatar from '@material-ui/core/Avatar';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -25,6 +26,7 @@ import {Contact} from './interfaces'
 
 import { BrowserRouter as Router, Route, Link as RouterLink } from "react-router-dom";
 
+
 // pages
 import Home from './pages/Home'
 import ContactItem from './pages/ContactItem'
@@ -37,16 +39,17 @@ const nanoid = require('nanoid')
 
 function Header () {
   return (
+    
     <header>
       <nav>
-        <ul>
-          <li>
-            <RouterLink to="/">Home</RouterLink>
-          </li>
-          <li>
-            <RouterLink to="/new/">Add</RouterLink>
-          </li>
-        </ul>
+      <Breadcrumbs aria-label="breadcrumb">
+        <Link color="inherit" href="/">
+          Home
+        </Link>
+        <Link color="inherit" href="/new/">
+          Add new contact
+        </Link>
+      </Breadcrumbs>
       </nav>
     </header>
   )
@@ -68,6 +71,8 @@ class App extends Component<AppProps, {}> {
     this.client = new GraphQLClient('/')
     this.getContact = this.getContact.bind(this)
     this.addContact = this.addContact.bind(this)
+    this.updateContact = this.updateContact.bind(this)
+    this.deleteContact = this.deleteContact.bind(this)
   }
 
   state: AppState = {
@@ -107,18 +112,58 @@ class App extends Component<AppProps, {}> {
   }
 
   async addContact (contact: Contact) {
-    const newContact = Object.assign({id: nanoid(), contact})
-    const contactStr = JSON.stringify(newContact)
+    const newContact = Object.assign({}, {contact})
+    newContact.contact.id = nanoid()
+    const gQuery = `
+    mutation addContact($contact: InputContact) {
+      addContact(contact: $contact) {
+        id, name, email
+      } 
+    }`
+    const gVariables = {
+      contact: newContact.contact
+    }
     try {
-      const data = await this.client.request(`
-      mutation  addContact($contact: "${contactStr}") {
-        addContact(contact: $contact) {
-          id, name, email
-        }
-            
-      }`)
-      console.log('getContact', data)
+      const data = await this.client.request(gQuery, gVariables)
       return data
+    } catch (e) {
+      console.warn(e)
+    }
+  }
+
+  async updateContact (contact: Contact) {
+    const newContact = Object.assign({}, {contact})
+  
+    const gQuery = `
+    mutation updateContact($contact: InputContact) {
+      updateContact(contact: $contact) {
+        id, name, email
+      } 
+    }`
+    const gVariables = {
+      contact: newContact.contact
+    }
+    try {
+      const data = await this.client.request(gQuery, gVariables)
+      return data
+    } catch (e) {
+      console.warn(e)
+    }
+  }
+
+  // deleteContact(id: ID): Boolean
+  async deleteContact (id: string) {
+    const gQuery = `
+    mutation deleteContact($id: ID) {
+      deleteContact(id: $id)
+    }`
+    const gVariables = {
+      id
+    }
+    // debugger
+    try {
+      const success =  await this.client.request(gQuery, gVariables)
+      return success.deleteContact
     } catch (e) {
       console.warn(e)
     }
@@ -128,7 +173,7 @@ class App extends Component<AppProps, {}> {
 
     const {data} = this.state
     return (
-      <Router>
+      <Router forceRefresh={true}>
         <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Header></Header>
@@ -155,6 +200,9 @@ class App extends Component<AppProps, {}> {
               return (
                 <ContactItem 
                   getContact={this.getContact}
+                  updateContact={this.updateContact}
+                  deleteContact={this.deleteContact}
+                  isEdit={true}
                   {...routeProps} {...data} id={routeProps.match.params.id} />
                 )
             }
