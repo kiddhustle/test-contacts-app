@@ -26,7 +26,9 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
         contact: {
             id: '',
             email: '',
-            name: ''
+            name: '',
+            dateCreated: '',
+            dateModified: ''
         }
     }
 
@@ -97,7 +99,7 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
     render () {
         const {id} = this.props
         const {contact} = this.state
-        const {name, email} = contact
+        const {name, email, dateCreated, dateModified} = contact
 
         return (
             <form noValidate autoComplete="off">
@@ -127,7 +129,23 @@ export class ContactItem extends Component<ContactItemProps, ContactItemState > 
                     label="Email"
                     value={email}
                     onChange={this.onKeyChange}
-                    /><br /><br />
+                    /><br />
+                {!this._isCreate && 
+                (<React.Fragment>
+                    <TextField
+                        id="contact-date-created"
+                        label="Date Created"
+                        value={dateCreated}
+                        InputProps={{readOnly: true}}
+                        /><br />
+                    <TextField
+                        id="contact-date-modified"
+                        label="Date Modified"
+                        value={dateModified}
+                        InputProps={{readOnly: true}}
+                        /><br />
+                </React.Fragment>)}
+                <br />
                 {this._isCreate ? (
                     <Button
                         variant="contained" color="primary"

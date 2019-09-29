@@ -3,7 +3,9 @@ import { RouteComponentProps } from 'react-router-dom'
 export interface Contact {
     id: string | undefined,
     email: string | undefined,
-    name: string | undefined
+    name: string | undefined,
+    dateCreated: string | undefined,
+    dateModified: string | undefined
 }
 
 

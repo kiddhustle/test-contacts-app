@@ -88,7 +88,7 @@ class App extends Component<AppProps, {}> {
       const data = await this.client.request(`
       {
         contact(id: "${id}") {
-            id, name, email
+            id, name, email, dateCreated, dateModified
         }
       }`)
       return data
@@ -98,16 +98,17 @@ class App extends Component<AppProps, {}> {
   }
 
   async addContact (contact: Contact) {
-    const newContact = Object.assign({}, {contact})
-    newContact.contact.id = nanoid()
+    const {name, email} = contact
+    const newContact = Object.assign({}, {name, email})
+    
     const gQuery = `
     mutation addContact($contact: InputContact) {
       addContact(contact: $contact) {
-        id, name, email
+        id, name, email, dateCreated, dateModified
       } 
     }`
     const gVariables = {
-      contact: newContact.contact
+      contact: newContact
     }
     try {
       const data = await this.client.request(gQuery, gVariables)
@@ -123,7 +124,7 @@ class App extends Component<AppProps, {}> {
     const gQuery = `
     mutation updateContact($contact: InputContact) {
       updateContact(contact: $contact) {
-        id, name, email
+        id, name, email, dateCreated, dateModdified
       } 
     }`
     const gVariables = {
@@ -155,7 +156,11 @@ class App extends Component<AppProps, {}> {
     }
   }
 
-  render() {
+  getCurrentDate() {
+    return new Date().toISOString()
+  }
+
+  render () {
 
     const {data} = this.state
     return (

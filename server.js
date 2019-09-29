@@ -24,7 +24,13 @@ const server = new ApolloServer({
     },
     Mutation: {
       async addContact(_, { contact }) {
-        let newContact = { ...contact, id: uid() };
+        let now = new Date().toISOString()
+        let newContact = {
+          ...contact,
+          id: uid(),
+          dateCreated: now,
+          dateModified: now
+        };
         await db
           .get("contacts")
           .push(newContact)
@@ -39,10 +45,11 @@ const server = new ApolloServer({
         return true;
       },
       async updateContact(_, { contact }) {
+        let now = new Date().toISOString()
         await db
           .get("contacts")
           .find({ id: contact.id })
-          .assign({ ...contact })
+          .assign({ ...contact, dateModified: now })
           .write();
 
         return db
@@ -54,13 +61,14 @@ const server = new ApolloServer({
   },
   typeDefs: `
     type Contact {
-      id: ID
+      id: ID!
       name: String
-      email: String
+      email: String,
+      dateCreated: String,
+      dateModified: String
     }
 
     input InputContact {
-      id: ID
       name: String
       email: String
     }
